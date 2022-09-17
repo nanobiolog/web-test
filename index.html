@@ -1,13 +1,87 @@
-<!--create basic homepage-->
+<!--create a forum website with php and mysql-->
+<!--create design file in css-->
+<!--create database in mysql-->
+
 <html>
-<head>
-<title>Home</title>
-</head>
-<body>  
-<h1>Home</h1>
-<p>Home page</p>
-
-</body>
-
+    <head>
+        <title>Forum</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="menu">
+                <p class="welcome">Welcome, guest. <b><a href="login.php">Login</a></b></p>
+                <p class="logout"><b><a href="logout.php">Logout</a></b></p>
+                <p class="logout"><b><a href="register.php">Register</a></b></p>
+                <p class="logout"><b><a href="index.php">Index</a></b></p>
+            </div>
+            <div id="content">
+                <form method="post" action="add_topic.php">
+                    <table>
+                        <tr>
+                            <td>Topic Title</td>
+                            <td><input type="text" name="topic_title" size="40" /></td>
+                        </tr>
+                        <tr>
+                            <td>Topic Content</td>
+                            <td><textarea name="topic_content" rows="5" cols="50" /></textarea></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="submit" name="submit" value="Add Topic" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </body>
 </html>
+
+<?php
+    session_start();
+    include 'connect.php';
+    include 'header.php';
+    
+    echo '<h2>Create a topic</h2>';
+    if($_SESSION['signed_in'] == false)
+    {
+        echo 'Sorry, you have to be <a href="login.php">signed in</a> to create a topic.';
+    }
+    else
+    {
+        if($_SERVER['REQUEST_METHOD'] != 'POST')
+        {
+            echo '<form method="post" action="">
+                Subject: <input type="text" name="topic_subject" />
+                Message: <textarea name="topic_content" /></textarea>
+                <input type="submit" value="Add topic" />
+             </form>';
+        }
+        else
+        {
+            $sql = "INSERT INTO
+                        topics(topic_subject,
+                               topic_date,
+                               topic_cat,
+                               topic_by)
+                   VALUES('" . mysql_real_escape_string($_POST['topic_subject']) . "',
+                               NOW(),
+                               " . mysql_real_escape_string($_GET['id']) . ",
+                               " . $_SESSION['user_id'] . "
+                               )";
+            $result = mysql_query($sql);
+            if(!$result)
+            {
+                echo 'Your topic could not be posted. Please try again later.';
+            }
+            else
+            {
+                echo 'Your topic has been posted. <a href="topic.php?id='. mysql_insert_id() . '">View your topic</a>.';
+            }
+        }
+    }
+
+    include 'footer.php';
+?>
+
+
 
